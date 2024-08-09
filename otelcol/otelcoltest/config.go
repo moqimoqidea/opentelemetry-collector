@@ -7,25 +7,12 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/confmap"
-	"go.opentelemetry.io/collector/confmap/converter/expandconverter"
 	"go.opentelemetry.io/collector/confmap/provider/envprovider"
 	"go.opentelemetry.io/collector/confmap/provider/fileprovider"
 	"go.opentelemetry.io/collector/confmap/provider/httpprovider"
 	"go.opentelemetry.io/collector/confmap/provider/yamlprovider"
 	"go.opentelemetry.io/collector/otelcol"
 )
-
-// LoadConfigWithSettings loads a config.Config from the provider settings, and does NOT validate the configuration.
-//
-// Deprecated: [v0.104.0] Use LoadConfig instead
-func LoadConfigWithSettings(factories otelcol.Factories, set otelcol.ConfigProviderSettings) (*otelcol.Config, error) {
-	// Read yaml config from file
-	provider, err := otelcol.NewConfigProvider(set)
-	if err != nil {
-		return nil, err
-	}
-	return provider.Get(context.Background(), factories)
-}
 
 // LoadConfig loads a config.Config  from file, and does NOT validate the configuration.
 func LoadConfig(fileName string, factories otelcol.Factories) (*otelcol.Config, error) {
@@ -38,24 +25,12 @@ func LoadConfig(fileName string, factories otelcol.Factories) (*otelcol.Config, 
 				yamlprovider.NewFactory(),
 				httpprovider.NewFactory(),
 			},
-			ConverterFactories: []confmap.ConverterFactory{expandconverter.NewFactory()},
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
 	return provider.Get(context.Background(), factories)
-}
-
-// LoadConfigAndValidateWithSettings loads a config from the provider settings, and validates the configuration.
-//
-// Deprecated: [v0.104.0] Use LoadConfigAndValidate instead
-func LoadConfigAndValidateWithSettings(factories otelcol.Factories, set otelcol.ConfigProviderSettings) (*otelcol.Config, error) {
-	cfg, err := LoadConfigWithSettings(factories, set)
-	if err != nil {
-		return nil, err
-	}
-	return cfg, cfg.Validate()
 }
 
 // LoadConfigAndValidate loads a config from the file, and validates the configuration.
